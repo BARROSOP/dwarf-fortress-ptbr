@@ -75,15 +75,39 @@ BAIXAR = {
 }
 
 
-def baixar(dst, cache):
+MIRRORS = [
+    "https://dfint.github.io/update-data/store/",
+    "https://raw.githubusercontent.com/dfint/update-data/main/store/",
+    "https://cdn.jsdelivr.net/gh/dfint/update-data@main/store/",
+]
+
+
+def baixar(dst, cache, log=print):
+    """Tenta cada espelho (3x cada); por fim usa arquivo local em 'arquivos-oficiais' ao lado do .exe."""
     import urllib.request
     rel, sha = BAIXAR[dst]
-    data = urllib.request.urlopen(BASE + rel, timeout=30).read()
-    if hashlib.sha256(data).hexdigest() != sha:
-        raise RuntimeError(f"Arquivo baixado difere do esperado: {rel}")
-    p = cache / dst.replace("/", "_")
-    p.write_bytes(data)
-    return p
+    nome = rel.split("/")[-1]
+    erros = []
+    for base in MIRRORS:
+        for tent in range(3):
+            try:
+                req = urllib.request.Request(base + rel, headers={"User-Agent": "Mozilla/5.0 (DF-PTBR installer)"})
+                data = urllib.request.urlopen(req, timeout=30).read()
+                if hashlib.sha256(data).hexdigest() != sha:
+                    raise RuntimeError("SHA-256 diferente do esperado")
+                p = cache / dst.replace("/", "_")
+                p.write_bytes(data)
+                return p
+            except Exception as e:
+                erros.append(f"{base.split('/')[2]}: {e}")
+                time.sleep(1)
+    for pasta in (Path(sys.executable).parent, Path(__file__).parent, Path.cwd()):
+        loc = pasta / "arquivos-oficiais" / nome
+        if loc.exists() and hashlib.sha256(loc.read_bytes()).hexdigest() == sha:
+            log(f"  usando arquivo local: {loc}")
+            return loc
+    raise RuntimeError(f"Não consegui baixar {rel} (rede/antivírus bloqueando?). Último erro: {erros[-1]}. "
+                       f"Alternativa: baixe '{nome}' de {MIRRORS[1]}{rel} e coloque na pasta 'arquivos-oficiais' ao lado do instalador.")
 
 
 def files_map():
@@ -107,7 +131,7 @@ def install(game, log=print, force=False):
     import tempfile
     cache = Path(tempfile.mkdtemp(prefix="dfptbr_"))
     log("Baixando arquivos oficiais do hook (config, offsets, codificação, fonte)…")
-    fontes = {dst: baixar(dst, cache) for dst in BAIXAR}
+    fontes = {dst: baixar(dst, cache, log) for dst in BAIXAR}
     bk = game / BACKUP
     if (game / LOG).exists():
         log("Instalação anterior detectada; reinstalando por cima (backup original preservado).")
