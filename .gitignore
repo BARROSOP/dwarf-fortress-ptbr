@@ -1,0 +1,4 @@
+_build/
+dist/
+__pycache__/
+_teste/

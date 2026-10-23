@@ -1,0 +1,3 @@
+payload/** -text
+*.dll binary
+*.png binary
