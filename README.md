@@ -1,4 +1,4 @@
-﻿# Dwarf Fortress em Português (PT-BR)
+# Dwarf Fortress em Português (PT-BR)
 
 Instalador gráfico da tradução para **Dwarf Fortress 53.16 (Steam, Windows x64)**. Traduz a interface e os textos do jogo para português do Brasil (31.902 frases).
 
