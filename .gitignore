@@ -2,3 +2,6 @@ _build/
 dist/
 __pycache__/
 _teste/
+_*.py
+_*.ps1
+_prints/

@@ -1,0 +1,40 @@
+name: Feedback da tradução
+description: Relate um erro de tradução, texto que vaza da caixa ou sugestão
+title: "[Feedback] "
+labels: ["feedback"]
+body:
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de problema
+      options:
+        - Texto vaza da caixa / menu
+        - Tradução errada ou estranha
+        - Texto ainda em inglês
+        - Erro ao instalar
+        - Outro
+    validations:
+      required: true
+  - type: input
+    id: onde
+    attributes:
+      label: Onde aparece (tela ou menu)
+      placeholder: "Ex.: Criar novo mundo > Parâmetros avançados"
+    validations:
+      required: true
+  - type: textarea
+    id: texto
+    attributes:
+      label: O que está escrito e como deveria ser
+      placeholder: "Está: ...  Deveria: ..."
+    validations:
+      required: true
+  - type: textarea
+    id: print
+    attributes:
+      label: Print (arraste a imagem aqui)
+  - type: input
+    id: versao
+    attributes:
+      label: Versão do instalador
+      placeholder: "v3.1"
